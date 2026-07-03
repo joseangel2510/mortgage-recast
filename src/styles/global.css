@@ -166,6 +166,15 @@ code {
   font-family: var(--font-display);
   background: var(--surface-2);
 }
+/* wide tables scroll instead of pushing the page wider on small screens */
+@media (max-width: 40rem) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}
 
 /* header / footer */
 .site-header {

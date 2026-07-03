@@ -15,6 +15,9 @@ for (const id of ids) el[id] = $(`#${id}`) as unknown as HTMLInputElement;
 const hint = $('#tool-hint');
 const results = $('#results');
 
+let lastResult: CompareResult | null = null;
+let lastHasRefi = false;
+
 const num = (s: string): number => Number(String(s).replace(/[^0-9.]/g, '')) || 0;
 const money0 = (n: number): string => '$' + Math.round(n).toLocaleString('en-US');
 const COLORS = { recast: '#0b6e8f', extra: '#e8952a', refi: '#55677a' };
@@ -162,6 +165,8 @@ function update(): void {
   });
   hint.hidden = true;
   results.hidden = false;
+  lastResult = c;
+  lastHasRefi = hasRefi;
   render(c, hasRefi);
   writeHash(parsed);
 }
@@ -220,9 +225,20 @@ $('#btn-share').addEventListener('click', async () => {
   }
 });
 $('#btn-print').addEventListener('click', () => window.print());
+
+let resizeTimer = 0;
 window.addEventListener('resize', () => {
-  if (!results.hidden) update();
+  clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => {
+    if (!results.hidden) renderChartOnly();
+  }, 200);
 });
 
+// Re-render only the chart on resize (cheap) instead of recomputing everything.
+function renderChartOnly(): void {
+  if (lastResult) renderChart(lastResult, lastHasRefi);
+}
+
 window.addEventListener('hashchange', restoreFromHash);
-restoreFromHash();
+// Defer the first render past first paint so it doesn't block the critical path.
+requestAnimationFrame(restoreFromHash);
