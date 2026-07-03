@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="About RecastWise"
+  description="Why RecastWise exists: one clear, honest mortgage recast calculator that compares recast, extra principal, and refinance — with the trade-offs spelled out."
+  path="/about/"
+>
+  <div class="wrap">
+    <article class="prose" style="padding-block: 2rem;">
+      <h1>About RecastWise</h1>
+      <p>
+        RecastWise does one thing well: it shows you what happens to your mortgage when you put a lump sum toward it —
+        your new payment if you recast, and how that stacks up against paying the same amount as extra principal or
+        refinancing.
+      </p>
+      <p>
+        We built it because the existing recast calculators stop short. Most show a single new payment and call it a
+        day. They don't show the honest trade-off — that recasting lowers your payment but costs more total interest
+        than extra principal, or that a refinance only wins past its break-even. That comparison is the whole decision,
+        so we put it front and center, with an amortization chart to make it concrete.
+      </p>
+      <h2>How the numbers work</h2>
+      <p>
+        Everything is computed in your browser using standard amortization math — your figures never leave your device.
+        The recast payment re-amortizes your reduced balance over the same remaining term at the same rate, exactly as
+        a servicer does. The extra-principal scenario keeps your current payment and finishes early. The refinance leg
+        uses the rate, term, and closing costs you enter, with a break-even in months.
+      </p>
+      <h2>Honesty about accuracy</h2>
+      <p>
+        This is an educational estimate, not a quote. Recast fees, minimum lump sums, seasoning rules, and eligibility
+        vary by servicer, loan type, investor, and state, and they change over time. Our
+        <a href="/lenders/">lender pages</a> label each figure's confidence and show when it was last verified — and we
+        always point you back to your own servicer for binding terms. If something looks off,
+        <a href="/contact/">tell us</a>.
+      </p>
+      <p>
+        RecastWise is free, supported by advertising, and requires no account. See our
+        <a href="/privacy-policy/">privacy policy</a> and <a href="/terms/">terms of use</a>.
+      </p>
+    </article>
+  </div>
+</Base>

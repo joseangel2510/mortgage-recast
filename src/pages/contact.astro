@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { CONTACT_EMAIL } from '../config';
+---
+
+<Base
+  title="Contact RecastWise"
+  description="Questions, corrections, or feedback about RecastWise's mortgage recast calculator? Here's how to reach us."
+  path="/contact/"
+>
+  <div class="wrap">
+    <article class="prose" style="padding-block: 2rem;">
+      <h1>Contact</h1>
+      <p>Spotted a number that looks wrong, or have a lender policy update? We want to know — accuracy is the point.</p>
+      <p>Email us at <a href={`mailto:${CONTACT_EMAIL}`}><strong>{CONTACT_EMAIL}</strong></a>.</p>
+      <p>Please never send account numbers or other sensitive financial details — a general description is all we need to help.</p>
+    </article>
+  </div>
+</Base>

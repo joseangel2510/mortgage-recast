@@ -1,0 +1,177 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import FaqBlock from '../../components/FaqBlock.astro';
+import { SITE_URL, SITE_NAME } from '../../config';
+import { LENDERS, LENDERS_LAST_VERIFIED, ELIGIBILITY, type Lender } from '../../lib/lenders';
+
+export function getStaticPaths() {
+  return LENDERS.map((l) => ({ params: { slug: l.slug }, props: { lender: l } }));
+}
+
+interface Props {
+  lender: Lender;
+}
+const { lender } = Astro.props;
+const path = `/lenders/${lender.slug}/`;
+
+const confidenceLabel = {
+  official: 'Officially published by the lender',
+  'semi-official': 'From the lender\'s educational pages (not a formal fee schedule)',
+  reported: 'Widely reported by third parties — not officially published',
+}[lender.confidence];
+
+const title = `${lender.name} Mortgage Recast: Fee, Minimum & How To`;
+const description = `Does ${lender.name} allow a mortgage recast? Reported fee, minimum lump sum, eligibility, and how to request one. Verified ${LENDERS_LAST_VERIFIED} — confirm with your servicer.`;
+
+const faqItems = [
+  {
+    q: `Does ${lender.name} offer mortgage recasting?`,
+    a:
+      lender.offers === 'yes'
+        ? `Yes — ${lender.name} is reported to offer recasting on eligible loans. ${lender.notes}`
+        : lender.offers === 'case-by-case'
+          ? `${lender.name} handles recasts case by case depending on your loan and investor. ${lender.notes}`
+          : `${lender.name}'s recast availability is not publicly documented. Contact the servicer to confirm. ${lender.notes}`,
+  },
+  {
+    q: `How much does a ${lender.name} recast cost?`,
+    a: `${lender.fee} (${confidenceLabel}.) Recast fees industry-wide are commonly $150–$500, and a few large banks are reported fee-free. Confirm the current fee directly with ${lender.name}.`,
+  },
+  {
+    q: `What is the minimum lump sum for a ${lender.name} recast?`,
+    a: `${lender.minimum} Minimums industry-wide are usually $5,000–$10,000, sometimes about 10% of the balance. Confirm with your servicer.`,
+  },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${lender.name} Mortgage Recast Policy`,
+    description,
+    dateModified: '2026-07-03',
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    mainEntityOfPage: new URL(path, SITE_URL).href,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Lenders', item: new URL('/lenders/', SITE_URL).href },
+      { '@type': 'ListItem', position: 3, name: lender.name, item: new URL(path, SITE_URL).href },
+    ],
+  },
+];
+---
+
+<Base title={title} description={description} path={path} schema={schema} current="lenders">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span aria-hidden="true">›</span>
+      <a href="/lenders/">Lenders</a> <span aria-hidden="true">›</span> <span>{lender.name}</span>
+    </nav>
+    <article class="prose">
+      <h1>{lender.name} Mortgage Recast: Fee, Minimum &amp; How to Request</h1>
+      <p class="updated-stamp">Last verified {LENDERS_LAST_VERIFIED} · {confidenceLabel}</p>
+
+      <div class="policy-card">
+        <div><span class="k">Offers recasting</span><span class="v">{lender.offers === 'yes' ? 'Yes, on eligible loans' : lender.offers === 'case-by-case' ? 'Case by case' : lender.offers === 'unknown' ? 'Not publicly documented' : 'No'}</span></div>
+        <div><span class="k">Reported fee</span><span class="v">{lender.fee}</span></div>
+        <div><span class="k">Reported minimum</span><span class="v">{lender.minimum}</span></div>
+        {lender.phone && <div><span class="k">Servicing phone</span><span class="v">{lender.phone}</span></div>}
+      </div>
+
+      <p class="disclaimer">
+        These figures are reported for planning and can change at any time. {lender.name}'s written recast agreement is
+        what binds — confirm the current fee, minimum, seasoning, and your loan's eligibility with {lender.name} before
+        sending any payment.
+      </p>
+
+      <h2>What to know about a {lender.name} recast</h2>
+      <p>{lender.notes}</p>
+
+      <h2>Is your loan eligible?</h2>
+      <ul>
+        <li>{ELIGIBILITY.conventional}</li>
+        <li>{ELIGIBILITY.government}</li>
+        <li>{ELIGIBILITY.jumbo}</li>
+        <li>{ELIGIBILITY.otherIneligible}</li>
+      </ul>
+
+      <h2>How to request a recast</h2>
+      <ol>
+        <li>Confirm your loan is current and past any seasoning period (often 2–6 on-time payments).</li>
+        <li>
+          Contact {lender.name}{lender.phone ? ` (${lender.phone})` : ''} and ask for their recast/re-amortization form —
+          most servicers require the request before or with the lump sum, so an unsolicited principal payment won't
+          automatically recast the loan.
+        </li>
+        <li>Make the qualifying lump-sum payment and pay any recast fee as directed.</li>
+        <li>Allow roughly 30–60 days for the new, lower payment to take effect.</li>
+      </ol>
+
+      <h2>See your new payment</h2>
+      <p>
+        Estimate exactly how much a lump sum would lower your payment — and whether recasting, extra principal, or
+        refinancing costs least — in the <a href="/">recast calculator</a>. New to recasting? Start with
+        <a href="/what-is-a-mortgage-recast/">what is a mortgage recast</a>, or compare other servicers on the
+        <a href="/lenders/">lender policies page</a>.
+      </p>
+    </article>
+    <AdSlot />
+    <FaqBlock items={faqItems} />
+  </div>
+</Base>
+
+<style>
+  .crumbs {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    padding-block: 1.2rem 0.5rem;
+  }
+  .updated-stamp {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+  .policy-card {
+    display: grid;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: var(--hairline);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    margin: 1.2rem 0;
+    box-shadow: var(--shadow);
+  }
+  .policy-card > div {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 0.6rem;
+    align-items: baseline;
+    border-top: 1px dotted var(--line);
+    padding-top: 0.6rem;
+  }
+  .policy-card > div:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+  .policy-card .k {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .policy-card .v {
+    max-width: none;
+  }
+  @media (max-width: 34rem) {
+    .policy-card > div {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+</style>

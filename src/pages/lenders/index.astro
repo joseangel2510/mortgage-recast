@@ -1,0 +1,101 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { SITE_URL, SITE_NAME } from '../../config';
+import { LENDERS, LENDERS_LAST_VERIFIED, GENERAL } from '../../lib/lenders';
+
+const path = '/lenders/';
+const title = 'Mortgage Recast Policies by Lender: Fees & Minimums';
+const description =
+  'Recast fees, minimum lump sums, and eligibility for Chase, Wells Fargo, Rocket, Mr. Cooper, PennyMac and more. Verified ranges — confirm with your servicer.';
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Mortgage Recast Policies by Lender',
+    description,
+    dateModified: '2026-07-03',
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    mainEntityOfPage: new URL(path, SITE_URL).href,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Lender Recast Policies', item: new URL(path, SITE_URL).href },
+    ],
+  },
+];
+---
+
+<Base title={title} description={description} path={path} schema={schema} current="lenders">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span aria-hidden="true">›</span> <span>Lender Recast Policies</span>
+    </nav>
+    <article class="prose">
+      <h1>Mortgage Recast Policies by Lender</h1>
+      <p>
+        Whether you can recast — and what it costs — depends on who services your loan. Below are the recast fees,
+        minimum lump sums, and eligibility notes we could find for major US servicers, with each figure's confidence
+        labeled. <strong>Last verified: {LENDERS_LAST_VERIFIED}.</strong>
+      </p>
+      <p class="disclaimer">
+        Fees, minimums, seasoning, and eligibility change and vary by loan, investor, and state. These are reported
+        ranges for planning — not quotes. Always confirm the current terms with your own servicer before making a
+        payment.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Lender</th>
+            <th>Offers recast?</th>
+            <th>Reported fee</th>
+            <th>Reported minimum</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            LENDERS.map((l) => (
+              <tr>
+                <td><a href={`/lenders/${l.slug}/`}>{l.name}</a></td>
+                <td>{l.offers === 'yes' ? 'Yes' : l.offers === 'case-by-case' ? 'Case by case' : l.offers === 'unknown' ? 'Not documented' : 'No'}</td>
+                <td>{l.fee.split('(')[0].split('.')[0].slice(0, 60)}</td>
+                <td>{l.minimum.split('(')[0].split('.')[0].slice(0, 60)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+
+      <h2>The general rules (industry norms)</h2>
+      <ul>
+        <li><strong>Fee:</strong> {GENERAL.feeRange}.</li>
+        <li><strong>Minimum lump sum:</strong> {GENERAL.minimum}.</li>
+        <li><strong>Seasoning:</strong> {GENERAL.seasoning}.</li>
+        <li><strong>Processing:</strong> {GENERAL.processing}.</li>
+        <li><strong>Frequency:</strong> {GENERAL.oneRecast}.</li>
+        <li><strong>Request first:</strong> {GENERAL.requestFirst}.</li>
+      </ul>
+      <p>
+        Government loans (FHA, VA, USDA) generally cannot be recast; conventional loans usually can. See any lender
+        above for details, learn the mechanics in
+        <a href="/what-is-a-mortgage-recast/">what is a mortgage recast</a>, and run your numbers in the
+        <a href="/">recast calculator</a>.
+      </p>
+    </article>
+    <AdSlot />
+  </div>
+</Base>
+
+<style>
+  .crumbs {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    padding-block: 1.2rem 0.5rem;
+  }
+</style>

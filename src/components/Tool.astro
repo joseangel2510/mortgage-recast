@@ -1,0 +1,129 @@
+---
+/**
+ * The interactive recast calculator. Server renders the shell; behavior is in
+ * src/scripts/tool.ts (the site's only client JS).
+ *
+ * DOM contract (used by tool.ts + Playwright — keep in sync):
+ * inputs #balance #rate #term-years #lump #recast-fee #refi-rate #refi-term #refi-costs
+ * #tool-hint #results .verdict .verdict-winner
+ * .scenario (.scenario-recast/.scenario-extra/.scenario-refi) with .is-winner
+ *   value spans: .v-payment .v-savings .v-interest .v-payoff .v-extra
+ * #chart (SVG injected) .chart-legend
+ * buttons #btn-share #btn-print · .stat-original
+ */
+---
+
+<section id="tool" class="tool card" aria-label="Mortgage recast calculator">
+  <form class="tool-form no-print" autocomplete="off" onsubmit="return false">
+    <fieldset>
+      <legend>Your mortgage</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="balance">Current balance</label>
+          <div class="input-money"><span>$</span><input type="text" inputmode="numeric" id="balance" value="250,000" /></div>
+        </div>
+        <div class="field">
+          <label for="rate">Interest rate</label>
+          <div class="input-pct"><input type="text" inputmode="decimal" id="rate" value="6.0" /><span>%</span></div>
+        </div>
+        <div class="field">
+          <label for="term-years">Years left on the loan</label>
+          <input type="text" inputmode="numeric" id="term-years" value="25" />
+        </div>
+        <div class="field">
+          <label for="lump">Lump sum to apply</label>
+          <div class="input-money"><span>$</span><input type="text" inputmode="numeric" id="lump" value="50,000" /></div>
+        </div>
+        <div class="field">
+          <label for="recast-fee">Recast fee (optional)</label>
+          <div class="input-money"><span>$</span><input type="text" inputmode="numeric" id="recast-fee" value="250" /></div>
+        </div>
+      </div>
+    </fieldset>
+
+    <details class="refi-toggle">
+      <summary>Compare a refinance too <span>(optional)</span></summary>
+      <div class="grid">
+        <div class="field">
+          <label for="refi-rate">Today's refinance rate</label>
+          <div class="input-pct"><input type="text" inputmode="decimal" id="refi-rate" placeholder="e.g. 6.5" /><span>%</span></div>
+        </div>
+        <div class="field">
+          <label for="refi-term">New loan term (years)</label>
+          <input type="text" inputmode="numeric" id="refi-term" placeholder="e.g. 30" />
+        </div>
+        <div class="field">
+          <label for="refi-costs">Closing costs</label>
+          <div class="input-money"><span>$</span><input type="text" inputmode="numeric" id="refi-costs" placeholder="e.g. 6,000" /></div>
+        </div>
+      </div>
+    </details>
+  </form>
+
+  <p id="tool-hint" class="tool-hint no-print" role="status"></p>
+
+  <div id="results" hidden>
+    <p class="stat-line">
+      Your payment today: <strong class="stat-original"></strong>/mo
+    </p>
+
+    <div class="verdict" role="status">
+      <span class="verdict-tag">Bottom line</span>
+      <p class="verdict-text"></p>
+    </div>
+
+    <div class="scenarios">
+      <article class="scenario scenario-recast">
+        <h3>Recast</h3>
+        <p class="scenario-sub">Lower payment, same rate &amp; payoff date</p>
+        <dl>
+          <div><dt>New payment</dt><dd class="v-payment big"></dd></div>
+          <div><dt>Monthly savings</dt><dd class="v-savings good"></dd></div>
+          <div><dt>Total interest left</dt><dd class="v-interest"></dd></div>
+          <div><dt>Payoff</dt><dd class="v-payoff"></dd></div>
+        </dl>
+      </article>
+
+      <article class="scenario scenario-extra">
+        <h3>Extra principal</h3>
+        <p class="scenario-sub">Same payment, pay off early</p>
+        <dl>
+          <div><dt>Payment</dt><dd class="v-payment big"></dd></div>
+          <div><dt>Time saved</dt><dd class="v-extra good"></dd></div>
+          <div><dt>Total interest left</dt><dd class="v-interest"></dd></div>
+          <div><dt>Payoff</dt><dd class="v-payoff"></dd></div>
+        </dl>
+      </article>
+
+      <article class="scenario scenario-refi" hidden>
+        <h3>Refinance</h3>
+        <p class="scenario-sub">New rate, new loan, closing costs</p>
+        <dl>
+          <div><dt>New payment</dt><dd class="v-payment big"></dd></div>
+          <div><dt>Monthly savings</dt><dd class="v-savings good"></dd></div>
+          <div><dt>Break-even</dt><dd class="v-extra"></dd></div>
+          <div><dt>Total interest left</dt><dd class="v-interest"></dd></div>
+        </dl>
+      </article>
+    </div>
+
+    <figure class="chart-wrap">
+      <figcaption>Balance over time — where each path gets you to $0</figcaption>
+      <div id="chart"></div>
+      <div class="chart-legend"></div>
+    </figure>
+
+    <div class="tool-actions no-print">
+      <button type="button" class="btn btn-primary" id="btn-share">🔗 Copy shareable link</button>
+      <button type="button" class="btn btn-ghost" id="btn-print">🖨️ Print</button>
+    </div>
+
+    <p class="disclaimer">
+      Estimates for education only — not financial advice. Recast fees, minimums, seasoning, and eligibility vary by
+      servicer, loan type, investor, and state. Government loans (FHA/VA/USDA) generally can't be recast. Confirm your
+      numbers with your servicer.
+    </p>
+  </div>
+</section>
+
+<script src="../scripts/tool.ts"></script>

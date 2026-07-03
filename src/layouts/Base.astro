@@ -1,0 +1,101 @@
+---
+import '@fontsource/schibsted-grotesk/latin-600.css';
+import '@fontsource/schibsted-grotesk/latin-700.css';
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import '../styles/global.css';
+import { SITE_URL, SITE_NAME, ADSENSE_CLIENT_ID } from '../config';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  schema?: object[];
+  current?: string;
+}
+
+const { title, description, path, schema = [], current } = Astro.props;
+const canonical = new URL(path, SITE_URL).href;
+const ogImage = new URL('/og.png', SITE_URL).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    {schema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    {
+      ADSENSE_CLIENT_ID && (
+        <script
+          is:inline
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+          crossorigin="anonymous"
+        />
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a href="/" class="wordmark" aria-label={`${SITE_NAME} home`}>
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="2" y="2" width="28" height="28" rx="7" fill="#0B6E8F"></rect>
+            <path d="M7 22 L13 14 L18 18 L25 9" fill="none" stroke="#E8952A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle cx="25" cy="9" r="2.4" fill="#fff"></circle>
+          </svg>
+          <span>Recast<em>Wise</em></span>
+        </a>
+        <nav class="site-nav" aria-label="Main">
+          <a href="/" aria-current={current === 'home' ? 'page' : undefined}>Calculator</a>
+          <a href="/recast-vs-refinance/" aria-current={current === 'refi' ? 'page' : undefined}>vs Refinance</a>
+          <a href="/what-is-a-mortgage-recast/" aria-current={current === 'guides' ? 'page' : undefined}>Guides</a>
+          <a href="/lenders/" aria-current={current === 'lenders' ? 'page' : undefined}>Lenders</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <nav aria-label="Footer">
+          <a href="/">Recast Calculator</a>
+          <a href="/what-is-a-mortgage-recast/">What Is a Recast</a>
+          <a href="/recast-vs-refinance/">Recast vs Refinance</a>
+          <a href="/recast-vs-extra-principal/">Recast vs Extra Principal</a>
+          <a href="/is-recasting-worth-it/">Is It Worth It?</a>
+          <a href="/lenders/">Lender Policies</a>
+          <a href="/about/">About</a>
+          <a href="/contact/">Contact</a>
+          <a href="/privacy-policy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+        </nav>
+        <p>
+          {SITE_NAME} provides general educational estimates, not financial, tax, or legal advice. Loan terms, fees,
+          minimums, and eligibility vary by servicer, investor, and state and change over time — always confirm with
+          your own mortgage servicer before acting.
+        </p>
+        <p>© 2026 {SITE_NAME}.</p>
+      </div>
+    </footer>
+  </body>
+</html>

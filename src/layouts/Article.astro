@@ -1,0 +1,81 @@
+---
+import Base from './Base.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { SITE_URL, SITE_NAME } from '../config';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  h1: string;
+  updated: string;
+  current?: string;
+}
+const { title, description, path, h1, updated, current = 'guides' } = Astro.props;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: h1,
+    description,
+    dateModified: updated,
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    mainEntityOfPage: new URL(path, SITE_URL).href,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: h1, item: new URL(path, SITE_URL).href },
+    ],
+  },
+];
+---
+
+<Base title={title} description={description} path={path} schema={schema} current={current}>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> <span aria-hidden="true">›</span> <span>{h1}</span>
+    </nav>
+    <article class="prose">
+      <h1>{h1}</h1>
+      <p class="updated">Updated {updated} · General education, not financial advice</p>
+      <slot />
+    </article>
+    <AdSlot />
+    <aside class="cta card">
+      <h2>Run your own numbers</h2>
+      <p>See your recast payment and the recast vs extra-principal vs refinance comparison in seconds — free.</p>
+      <a class="btn btn-primary" href="/">Open the recast calculator →</a>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .crumbs {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    padding-block: 1.2rem 0.5rem;
+  }
+  .updated {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    margin-top: 0.5rem;
+  }
+  .cta {
+    margin-top: 3rem;
+    padding: clamp(1.4rem, 4vw, 2.2rem);
+    text-align: center;
+    background: linear-gradient(140deg, var(--brand-tint), transparent 60%), var(--surface);
+  }
+  .cta h2 {
+    margin-bottom: 0.5rem;
+  }
+  .cta p {
+    margin: 0 auto 1.2rem;
+    color: var(--ink-2);
+  }
+</style>
